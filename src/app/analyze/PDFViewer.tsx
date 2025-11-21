@@ -43,7 +43,7 @@ export default function PDFViewer({ onHeights }: PDFViewerProps) {
           key={`page_${index + 1}`}
           pageNumber={index + 1}
           onLoadSuccess={() => onPageLoadSuccess(index + 1)}
-          width={600}
+          width={800}
           renderTextLayer={false}
           renderAnnotationLayer={false}
         />
