@@ -29,12 +29,7 @@ TEMPLATE_DIR.mkdir(exist_ok=True)
 SYMBOL_SIZE = 64
 
 
-
 def preprocess_symbol(img, size=SYMBOL_SIZE):
-    """
-    img: BGR or grayscale symbol crop
-    return: size x size binary float32 image in [0,1]
-    """
     if img.ndim == 3:
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     else:
@@ -79,11 +74,6 @@ def load_templates():
 
 
 def classify_symbol(crop_img, templates):
-    """
-    crop_img: BGR or grayscale
-    templates: dict name -> preprocessed numpy array
-    returns (best_name, best_score)
-    """
     feat = preprocess_symbol(crop_img)
     v = feat.ravel()
     best_name, best_score = None, -1.0
@@ -100,9 +90,6 @@ def classify_symbol(crop_img, templates):
 
 
 def capture_templates():
-    """
-    Step 1: manually select a few symbol crops and save them as template PNGs.
-    """
     img = cv2.imread(PAGE_IMG)
     if img is None:
         raise RuntimeError(f"Could not read {PAGE_IMG}")
@@ -131,9 +118,6 @@ def capture_templates():
 
 
 def test_matching():
-    """
-    Step 2: manually select one symbol and see which template it matches.
-    """
     img = cv2.imread(PAGE_IMG)
     if img is None:
         raise RuntimeError(f"Could not read {PAGE_IMG}")
@@ -145,7 +129,6 @@ def test_matching():
 
     print("Loaded templates:", list(templates.keys()))
 
-    # select a single ROI to classify
     r = cv2.selectROI(
         "Select ONE symbol to classify",
         img,
@@ -160,7 +143,6 @@ def test_matching():
     best_name, best_score = classify_symbol(crop, templates)
     print(f"Predicted: {best_name}, score={best_score:.3f}")
 
-    # show crop and best template side by side for sanity check
     best_template = templates[best_name]
     best_template_vis = (best_template * 255).astype(np.uint8)
 
