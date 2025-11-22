@@ -23,7 +23,7 @@ SUOJA_X2_FRAC = 1530.0 / REF_PAGE_WIDTH
 # Processing constants
 TARGET_H = 91
 MIN_BLOB_AREA = 30
-MATCH_THRESH = 0.5
+MATCH_THRESH = 0.3
 
 # Template directory (relative to app folder)
 TEMPLATE_DIR = Path(__file__).parent / "templates"
@@ -89,7 +89,7 @@ def prep_for_matching(img: np.ndarray, target_h: int = TARGET_H) -> np.ndarray:
 
     x1, x2 = xs.min(), xs.max()
     y1, y2 = ys.min(), ys.max()
-    crop = bw[y1:y2 + 1, x1:x2 + 1]
+    crop = bw[y1 : y2 + 1, x1 : x2 + 1]
 
     h, w = crop.shape
     scale = target_h / float(h)
@@ -116,7 +116,9 @@ def load_templates() -> dict:
     return templates
 
 
-def match_templates_in_row(row_roi_bgr: np.ndarray, templates: dict, thresh: float = MATCH_THRESH):
+def match_templates_in_row(
+    row_roi_bgr: np.ndarray, templates: dict, thresh: float = MATCH_THRESH
+):
     """Match templates against a row ROI. Returns (name, score, x_position)."""
     if not templates:
         return "unknown", 0.0, None
@@ -226,17 +228,21 @@ def extract_page(img: np.ndarray, templates: dict, page_number: int) -> Extracte
         suoja_roi = img[y1:y2, suoja_x1:suoja_x2]
         suoja_text = ocr_suoja(suoja_roi)
 
-        rows.append(ExtractedRow(
-            row_index=idx,
-            symbol=symbol_name,
-            symbol_score=round(score, 3),
-            suoja=suoja_text
-        ))
+        rows.append(
+            ExtractedRow(
+                row_index=idx,
+                symbol=symbol_name,
+                symbol_score=round(score, 3),
+                suoja=suoja_text,
+            )
+        )
 
     return ExtractedPage(page_number=page_number, rows=rows)
 
 
-def extract_from_pdf_bytes(pdf_bytes: bytes, filename: str, dpi: int = 300) -> ExtractionResult:
+def extract_from_pdf_bytes(
+    pdf_bytes: bytes, filename: str, dpi: int = 300
+) -> ExtractionResult:
     """
     Main extraction function: takes PDF bytes, returns structured extraction result.
     """
@@ -248,11 +254,7 @@ def extract_from_pdf_bytes(pdf_bytes: bytes, filename: str, dpi: int = 300) -> E
         images = convert_from_bytes(pdf_bytes, dpi=dpi)
     except Exception as e:
         return ExtractionResult(
-            status="error",
-            filename=filename,
-            total_pages=0,
-            total_rows=0,
-            pages=[]
+            status="error", filename=filename, total_pages=0, total_rows=0, pages=[]
         )
 
     pages = []
@@ -272,5 +274,5 @@ def extract_from_pdf_bytes(pdf_bytes: bytes, filename: str, dpi: int = 300) -> E
         filename=filename,
         total_pages=len(images),
         total_rows=total_rows,
-        pages=pages
+        pages=pages,
     )
