@@ -23,8 +23,8 @@ export default function PageAnalysisPanel({
 }: PageAnalysisPanelProps) {
   return (
     <div
-      className="w-full bg-gray-700 rounded flex flex-col items-start justify-start text-white overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full"
-      style={{ minHeight: `${height}px` }}
+      className="w-full bg-gray-700 rounded flex flex-col items-start justify-start text-white overflow-x-auto overflow-y-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full"
+      style={{ height: `${height}px` }}
     >
       <div className="w-full min-w-[800px] border border-gray-500 border-solid overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full">
         {/* Header with field labels */}
@@ -67,7 +67,7 @@ export default function PageAnalysisPanel({
         </div>
 
         {/* Data rows */}
-        {[...Array(10)].map((_, rowIndex) => (
+        {[...Array(11)].map((_, rowIndex) => (
           <ExtractionField
             key={`${pageIndex}-${rowIndex}`}
             pageIndex={pageIndex}
