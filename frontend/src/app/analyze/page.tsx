@@ -20,18 +20,20 @@ export default function Analyze() {
   }, [extractionData]);
 
   return (
-    <div className="flex flex-col min-h-screen max-w-[1920px] mx-auto">
-      <Navbar
-        isPdfVisible={isPdfVisible}
-        onTogglePdf={() => setIsPdfVisible(!isPdfVisible)}
-      />
-      <div className="flex flex-1 overflow-hidden">
-        <AnalysisCanvas
-          heights={heights}
-          isExpanded={!isPdfVisible}
-          dummyData={extractionData}
+    <div className=" bg-djanbee/8 ">
+      <div className="  flex flex-col min-h-screen max-w-[1920px] mx-auto">
+        <Navbar
+          isPdfVisible={isPdfVisible}
+          onTogglePdf={() => setIsPdfVisible(!isPdfVisible)}
         />
-        <PDFSidebar isVisible={isPdfVisible} onHeights={setHeights} />
+        <div className="flex flex-1 overflow-hidden  gap-1">
+          <AnalysisCanvas
+            heights={heights}
+            isExpanded={!isPdfVisible}
+            dummyData={extractionData}
+          />
+          <PDFSidebar isVisible={isPdfVisible} onHeights={setHeights} />
+        </div>
       </div>
     </div>
   );

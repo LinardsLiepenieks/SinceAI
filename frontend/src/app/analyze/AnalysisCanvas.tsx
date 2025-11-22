@@ -23,7 +23,7 @@ export default function AnalysisCanvas({
 }: AnalysisCanvasProps) {
   return (
     <div
-      className={`p-4 transition-all duration-300 overflow-y-auto ${
+      className={`my-4 transition-all duration-300 overflow-y-auto border border-foreground/20 ${
         isExpanded ? 'w-full' : 'w-1/2'
       }`}
     >
