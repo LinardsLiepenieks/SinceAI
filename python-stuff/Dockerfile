@@ -19,8 +19,9 @@ COPY app ./app
 # Create temp directories for processing
 RUN mkdir -p /tmp/uploads /tmp/processed
 
-# make a non-root user (optional but recommended)
-RUN useradd -m appuser && chown -R appuser:appuser /tmp/uploads /tmp/processed
+# make a non-root user and set permissions
+RUN useradd -m appuser && \
+    chown -R appuser:appuser /app /tmp/uploads /tmp/processed
 USER appuser
 
 ENV PYTHONUNBUFFERED=1
