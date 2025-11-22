@@ -32,19 +32,20 @@ export default function PDFViewer({ onHeights }: PDFViewerProps) {
   }
 
   function onPageLoadSuccess(pageNumber: number) {
-    // Get canvas element and its height
-    const canvas = document.querySelector(
-      `[data-page-number="${pageNumber}"] canvas`
-    ) as HTMLCanvasElement;
-    if (canvas) {
+    // Get canvas element and its rendered height (not pixel height)
+    const pageElement = document.querySelector(
+      `[data-page-number="${pageNumber}"]`
+    ) as HTMLElement;
+    if (pageElement) {
       const currentHeights = Array(numPages).fill(0);
-      currentHeights[pageNumber - 1] = canvas.height;
+      // Use offsetHeight which gives the actual rendered height in CSS pixels
+      currentHeights[pageNumber - 1] = pageElement.offsetHeight;
 
       // Check if all pages are loaded
-      const allCanvases = document.querySelectorAll('.react-pdf__Page canvas');
-      if (allCanvases.length === numPages) {
-        const heights = Array.from(allCanvases).map(
-          (c) => (c as HTMLCanvasElement).height
+      const allPages = document.querySelectorAll('.react-pdf__Page');
+      if (allPages.length === numPages) {
+        const heights = Array.from(allPages).map(
+          (p) => (p as HTMLElement).offsetHeight
         );
         onHeights(heights);
       }

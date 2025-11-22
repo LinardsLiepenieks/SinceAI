@@ -12,7 +12,7 @@ export default function Analyze() {
   const { extractionData } = useExtractionData();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen max-w-[1920px] mx-auto">
       <Navbar
         isPdfVisible={isPdfVisible}
         onTogglePdf={() => setIsPdfVisible(!isPdfVisible)}

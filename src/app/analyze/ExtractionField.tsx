@@ -92,8 +92,14 @@ export default function ExtractionField({
     <>
       <div className="flex h-12 text-white px-4 items-center gap-4 flex-shrink-0 border border-gray-500">
         {/* ICON */}
-        <div className="flex items-center h-full" style={{ width: '164px' }}>
-          <div className="flex items-center overflow-x-auto overflow-y-hidden flex-1 h-full [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-none">
+        <div
+          className="flex items-center h-full flex-shrink-0"
+          style={{ width: '164px' }}
+        >
+          <div
+            className="flex items-center overflow-x-auto overflow-y-hidden h-full [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-none"
+            style={{ width: '132px' }}
+          >
             {selectedIcons.length > 0
               ? selectedIcons.map((iconId, index) => {
                   const symbol = getSymbolById(iconId);

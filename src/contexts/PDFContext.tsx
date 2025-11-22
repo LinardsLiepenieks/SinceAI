@@ -42,7 +42,7 @@ export function PDFProvider({ children }: { children: ReactNode }) {
 
       const apiUrl =
         process.env.NEXT_PUBLIC_API_URL || 'https://sinceai.onrender.com';
-      const response = await fetch(`${apiUrl}/upload`, {
+      const response = await fetch(`${apiUrl}/extract`, {
         method: 'POST',
         body: formData,
       });

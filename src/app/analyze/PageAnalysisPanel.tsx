@@ -23,15 +23,15 @@ export default function PageAnalysisPanel({
 }: PageAnalysisPanelProps) {
   return (
     <div
-      className="w-full bg-gray-700 rounded flex flex-col items-start justify-start py-2 text-white overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full"
-      style={{ height: `${height}px` }}
+      className="w-full bg-gray-700 rounded flex flex-col items-start justify-start text-white overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full"
+      style={{ minHeight: `${height}px` }}
     >
-      <div className="w-full border border-gray-500 border-solid h-full overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full">
+      <div className="w-full min-w-[800px] border border-gray-500 border-solid overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar]:w-[4px] [&::-webkit-scrollbar-track]:bg-gray-700 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full">
         {/* Header with field labels */}
         <div className="flex h-12 text-white px-4 items-center gap-4 flex-shrink-0 border mt-4 border-gray-500 bg-gray-800">
           {/* ICON */}
           <div
-            className="flex items-center gap-1 overflow-x-auto"
+            className="flex items-center flex-shrink-0"
             style={{ width: '164px' }}
           >
             <span className="text-sm font-medium whitespace-nowrap">ICON</span>
