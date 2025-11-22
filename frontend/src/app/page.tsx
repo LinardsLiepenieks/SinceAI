@@ -4,8 +4,8 @@ import Link from 'next/link';
 export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background font-sans max-w-[1920px] mx-auto relative">
-      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center  py-20 px-16  sm:items-start gap-16">
-        <div className="flex flex-col gap-8 ">
+      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center py-20 px-16 sm:items-start gap-16">
+        <div className="flex flex-col gap-8">
           <Image
             src="/logos/eisko-logo.svg"
             alt="Eisko logo"
@@ -20,7 +20,8 @@ export default function Home() {
             A SinceAI project
           </p>
         </div>
-        <div className="flex flex-col gap-8 text-center sm:items-start sm:text-left ">
+
+        <div className="flex flex-col gap-8 text-center sm:items-start sm:text-left">
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-semibold text-foreground">Features:</h2>
             <ul className="flex flex-col gap-3 text-zinc-600">
@@ -45,9 +46,10 @@ export default function Home() {
             </ul>
           </div>
         </div>
+
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <Link
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-djanbee hover:brightness-95 px-5 text-black transition-colors md:w-[200px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-djanbee hover:brightness-95 px-5 text-black transition-all duration-150 ease-in-out md:w-[200px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black/20"
             href="/upload"
           >
             Go to Upload
@@ -56,7 +58,7 @@ export default function Home() {
       </main>
 
       {/* Watermark */}
-      <div className="fixed bottom-6 left-6 flex items-center gap-2 opacity-40 ">
+      <div className="fixed bottom-6 left-6 flex items-center gap-2 opacity-40">
         <Image
           src="/logos/djanbee-logo.svg"
           alt="Djanbee logo"
