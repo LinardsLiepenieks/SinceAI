@@ -10,6 +10,8 @@ import pdfplumber
 from typing import List
 from pydantic import BaseModel
 
+from app.extractor import extract_from_pdf_bytes, ExtractionResult
+
 UPLOAD_DIR = Path("/tmp/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -188,3 +190,68 @@ async def upload_pdf_async(file: UploadFile = File(...)):
         "filename": file.filename,
         "message": "PDF uploaded. Processing will be done asynchronously."
     }, status_code=202)
+
+
+@app.post("/extract", response_model=ExtractionResult)
+async def extract_pdf(file: UploadFile = File(...)):
+    """
+    Upload a PDF file and extract symbols + Suoja values using CV and OCR.
+    Returns structured JSON with all extracted data.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No filename provided")
+
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+
+    # Read the PDF content
+    try:
+        pdf_bytes = await file.read()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read file: {str(e)}")
+    finally:
+        await file.close()
+
+    # Run extraction
+    try:
+        result = extract_from_pdf_bytes(pdf_bytes, file.filename)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Extraction failed: {str(e)}")
+
+    return result
+
+
+@app.post("/extract-with-pdf")
+async def extract_pdf_with_base64(file: UploadFile = File(...)):
+    """
+    Upload a PDF, extract data, and return both the extraction result and the PDF as base64.
+    Useful for frontend to display PDF alongside extracted data.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No filename provided")
+
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+
+    # Read the PDF content
+    try:
+        pdf_bytes = await file.read()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to read file: {str(e)}")
+    finally:
+        await file.close()
+
+    # Run extraction
+    try:
+        result = extract_from_pdf_bytes(pdf_bytes, file.filename)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Extraction failed: {str(e)}")
+
+    # Convert PDF to base64 for frontend display
+    pdf_base64 = base64.b64encode(pdf_bytes).decode('utf-8')
+    data_url = f"data:application/pdf;base64,{pdf_base64}"
+
+    return JSONResponse({
+        "extraction": result.model_dump(),
+        "pdf": data_url
+    })

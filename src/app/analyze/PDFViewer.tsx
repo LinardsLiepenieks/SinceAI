@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { usePDF } from '@/contexts/PDFContext';
 
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
 
@@ -10,8 +11,15 @@ interface PDFViewerProps {
 }
 
 export default function PDFViewer({ onHeights }: PDFViewerProps) {
+  const { pdfFile } = usePDF();
   const [numPages, setNumPages] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!pdfFile) {
+      setError('No PDF file uploaded. Please upload a PDF to analyze.');
+    }
+  }, [pdfFile]);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
@@ -20,7 +28,7 @@ export default function PDFViewer({ onHeights }: PDFViewerProps) {
 
   function onDocumentLoadError(error: Error) {
     console.error('Error loading PDF:', error);
-    setError('Failed to load PDF. Please upload a PDF file.');
+    setError('Failed to load PDF. Please upload a valid PDF file.');
   }
 
   function onPageLoadSuccess(pageNumber: number) {
@@ -43,11 +51,11 @@ export default function PDFViewer({ onHeights }: PDFViewerProps) {
     }
   }
 
-  if (error) {
+  if (error || !pdfFile) {
     return (
       <div className="flex items-center justify-center h-full text-gray-400">
         <div className="text-center">
-          <p className="mb-4">{error}</p>
+          <p className="mb-4">{error || 'No PDF uploaded'}</p>
           <a href="/upload" className="text-blue-400 hover:text-blue-300">
             Upload PDF
           </a>
@@ -58,7 +66,7 @@ export default function PDFViewer({ onHeights }: PDFViewerProps) {
 
   return (
     <Document
-      file="/sample.pdf"
+      file={pdfFile}
       onLoadSuccess={onDocumentLoadSuccess}
       onLoadError={onDocumentLoadError}
       loading={
