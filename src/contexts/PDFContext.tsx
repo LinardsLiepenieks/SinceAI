@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { PageExtractionData, ExtractionRowData } from './ExtractionDataContext';
-import { getSymbolByApiId } from '@/models/symbols';
+import { getSymbolByName } from '@/models/symbols';
 
 interface PDFContextType {
   pdfFile: string | null;
@@ -25,26 +25,33 @@ function transformExtractionData(apiData: any): PageExtractionData {
   if (!apiData?.pages) return transformed;
 
   apiData.pages.forEach((page: any) => {
-    const pageIndex = page.page_number - 1; // Convert to 0-based index
+    const pageIndex = (page.page_number ?? page.page_number) - 1; // Convert to 0-based index
 
-    transformed[pageIndex] = page.rows.map((row: any) => {
+    transformed[pageIndex] = (page.rows || []).map((row: any) => {
       const rowData: ExtractionRowData = {
-        suoja: row.suoja || '',
-        nro: String(row.row_index),
+        nro: String(row.row_index ?? ''),
+        kuvateksti: row.kuvaus ?? row.kuvateksti ?? '',
+        suoja: row.suoja ?? '',
+        kaapeli: row.kaapeli ?? '',
       };
 
-      // Map API symbol to our symbol ID using apiId
-      if (row.symbol && row.symbol !== 'unknown') {
-        const matchedSymbol = getSymbolByApiId(row.symbol);
-        if (matchedSymbol) {
-          rowData.icons = [matchedSymbol.id];
-          console.log(
-            `✓ Mapped API symbol "${row.symbol}" to "${matchedSymbol.id}"`
-          );
+      // The extractor now returns `symbols: ["NAME_OR_APIID"]` (and symbol_scores).
+      // Use the first symbol and match by human-readable name (not apiId) as requested.
+      const symbolsList: string[] =
+        row.symbols || row.symbol
+          ? Array.isArray(row.symbols)
+            ? row.symbols
+            : [row.symbol]
+          : [];
+      if (symbolsList.length > 0) {
+        const symbolKey = String(symbolsList[0]);
+        const matched = getSymbolByName(symbolKey);
+        if (matched) {
+          rowData.icons = [matched.id];
+          console.log(`✓ Mapped symbol "${symbolKey}" → "${matched.id}"`);
         } else {
-          console.warn(`⚠️ Unknown symbol from API: "${row.symbol}"`);
-          // Still store the API symbol name for debugging
-          rowData.icons = [row.symbol];
+          console.warn(`⚠️ Unknown symbol from extractor: "${symbolKey}"`);
+          rowData.icons = [symbolKey];
         }
       }
 

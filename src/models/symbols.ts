@@ -63,6 +63,35 @@ export function getSymbolByApiId(apiId: string): Symbol | undefined {
   return SYMBOLS.find((symbol) => symbol.apiId === apiId);
 }
 
+// Find a symbol by a human-readable name coming from the extractor.
+// The extractor may use spaces or underscores; try a few normalizations.
+export function getSymbolByName(name: string): Symbol | undefined {
+  if (!name) return undefined;
+  const raw = String(name).trim();
+
+  // Try exact name match
+  let found = SYMBOLS.find((s) => s.name === raw);
+  if (found) return found;
+
+  // Case-insensitive
+  found = SYMBOLS.find((s) => s.name.toLowerCase() === raw.toLowerCase());
+  if (found) return found;
+
+  // Replace underscores with spaces (common normalization)
+  const alt = raw.replace(/_/g, ' ');
+  found = SYMBOLS.find((s) => s.name.toLowerCase() === alt.toLowerCase());
+  if (found) return found;
+
+  // As a fallback, try matching against apiId by replacing spaces with underscores
+  const alt2 = raw.replace(/\s+/g, '_');
+  found = SYMBOLS.find(
+    (s) => s.apiId === alt2 || s.apiId.toLowerCase() === alt2.toLowerCase()
+  );
+  if (found) return found;
+
+  return undefined;
+}
+
 // Helper function to get symbol icon path
 export function getSymbolIconPath(symbol: Symbol): string {
   return `/el_icons/${symbol.iconFileName}`;
