@@ -10,7 +10,7 @@ import pdfplumber
 from typing import List
 from pydantic import BaseModel
 
-from app.extractor import extract_from_pdf_bytes, ExtractionResult
+from .extractor import extract_from_pdf_bytes, ExtractionResult
 
 UPLOAD_DIR = Path("/tmp/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
