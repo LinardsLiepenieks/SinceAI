@@ -6,9 +6,8 @@ import { usePDF } from '@/contexts/PDFContext';
 
 export default function Upload() {
   const router = useRouter();
-  const { uploadPDF } = usePDF();
+  const { uploadPDF, uploadStatus, uploadError } = usePDF();
   const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -24,15 +23,11 @@ export default function Upload() {
   const handleUpload = async () => {
     if (!file) return;
 
-    setUploading(true);
     try {
       await uploadPDF(file);
       router.push('/analyze');
     } catch (error) {
       console.error('Error uploading PDF:', error);
-      alert('Failed to upload PDF');
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -89,12 +84,20 @@ export default function Upload() {
           </div>
         )}
 
+        {uploadError && (
+          <div className="mb-6 p-4 bg-red-900/50 border border-red-500 rounded-lg">
+            <p className="text-sm text-red-200">
+              <span className="font-semibold">Error:</span> {uploadError}
+            </p>
+          </div>
+        )}
+
         <button
           onClick={handleUpload}
-          disabled={!file || uploading}
+          disabled={!file || uploadStatus === 'uploading'}
           className="w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
         >
-          {uploading ? 'Uploading...' : 'Upload and Analyze'}
+          {uploadStatus === 'uploading' ? 'Uploading...' : 'Upload and Analyze'}
         </button>
 
         <div className="mt-6 text-center">
