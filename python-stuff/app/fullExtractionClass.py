@@ -378,14 +378,43 @@ def _classify_page_core(img: np.ndarray):
                 if score > name_best_score[name]:
                     name_best_score[name] = score
 
-            # Only one of basic1line / basic3line per row (keep higher score)
-            b1 = name_best_score.get("JOHDONSUOJA 1-NAP")
-            b3 = name_best_score.get("JOHDONSUOJA 3-NAP")
-            if b1 is not None and b3 is not None:
-                if b1 >= b3:
-                    del name_best_score["JOHDONSUOJA 3-NAP"]
-                else:
-                    del name_best_score["JOHDONSUOJA 1-NAP"]
+            # After filling name_best_score from strong_symbols:
+
+            # Define groups of mutually-exclusive symbols.
+            # Within each group, keep only the one with highest score.
+            mutually_exclusive_groups = [
+                # Existing group: only one of these
+                ["JOHDONSUOJA 1-NAP", "JOHDONSUOJA 3-NAP"],
+
+                ["JOHDONSUOJA 1-NAP", "YHDISTELMASUOJA-2"],
+
+                # Group 2: YHDISTELMASUOJA / VIKAVIRTASUOJA variants
+                ["YHDISTELMASUOJA", "YHDISTELMASUOJA-2",
+                 "VIKAVIRTASUOJA", "VIKAVIRTASUOJA-2"],
+
+                # Group 3: 3-phase fuse variants
+                ["3-VAIHE KAHVAROKEALUSTA",
+                 "3-VAIHEINEN_TULPPAVAROKE",
+                 "3-VAIHEINEN_TULPPAVAROKE-2"],
+
+                # Group 4: contactors
+                ["1-NAP KONTAKTORI", "3-NAP KONTAKTORI"],
+            ]
+
+            for group in mutually_exclusive_groups:
+                # collect those that actually appeared in this row
+                present = [(name, name_best_score[name])
+                           for name in group
+                           if name in name_best_score]
+
+                if len(present) <= 1:
+                    continue  # nothing to resolve
+
+                # keep the one with highest score
+                best_name, _ = max(present, key=lambda x: x[1])
+                for name, _ in present:
+                    if name != best_name:
+                        del name_best_score[name]
 
             symbol_scores = dict(name_best_score)
             unique_symbols = sorted(name_best_score.keys())
