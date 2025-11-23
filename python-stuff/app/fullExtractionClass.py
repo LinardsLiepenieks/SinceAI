@@ -27,8 +27,9 @@ kuvaus_x1_FRAC = 853.0 / REF_PAGE_WIDTH
 kuvaus_x2_FRAC = 1410.0 / REF_PAGE_WIDTH
 kaapeli_x1_FRAC = 1655.0 / REF_PAGE_WIDTH
 kaapeli_x2_FRAC = 1950.0 / REF_PAGE_WIDTH
+nro_x1_FRAC = 636.0 / REF_PAGE_WIDTH
+nro_x2_FRAC = 726.0 / REF_PAGE_WIDTH
 
-# --- fixed row bands in Y, measured on a 2480 px reference page ---
 REF_PAGE_HEIGHT = 2480.0
 
 # On the reference page (height = 2480):
@@ -92,6 +93,8 @@ def compute_column_ranges(page_width: int):
     kuvaus_x2 = int(round(kuvaus_x2_FRAC * page_width))
     kaapeli_x1 = int(round(kaapeli_x1_FRAC * page_width))
     kaapeli_x2 = int(round(kaapeli_x2_FRAC * page_width))
+    nro_x1 = int(round(nro_x1_FRAC * page_width))
+    nro_x2 = int(round(nro_x2_FRAC * page_width))
     return (
         symbol_x1,
         symbol_x2,
@@ -101,6 +104,8 @@ def compute_column_ranges(page_width: int):
         kuvaus_x2,
         kaapeli_x1,
         kaapeli_x2,
+        nro_x1,
+        nro_x2
     )
 
 
@@ -308,6 +313,8 @@ def _classify_page_core(img: np.ndarray):
         kuvaus_x2,
         kaapeli_x1,
         kaapeli_x2,
+        nro_x1,
+        nro_x2
     ) = compute_column_ranges(w)
 
     templates = load_symbol_templates_for_matching_2d()
@@ -335,6 +342,7 @@ def _classify_page_core(img: np.ndarray):
         kuvaus_text = ""
         suoja_text = ""
         kaapeli_text = ""
+        nro_text = ""
 
         if sy2 > sy1:
             # --- SYMBOLS ---
@@ -355,6 +363,8 @@ def _classify_page_core(img: np.ndarray):
             kaapeli_roi = img[y1:y2, kaapeli_x1:kaapeli_x2]
             kaapeli_text = ocr_suoja(kaapeli_roi)
 
+            nro_roi = img[y1:y2, nro_x1:nro_x2]
+            nro_text = ocr_suoja(nro_roi)
             # --- FILTER + PER-SYMBOL BEST SCORE ---
             ROW_SYMBOL_THRESH = 0.80
             strong_symbols = [
@@ -391,6 +401,7 @@ def _classify_page_core(img: np.ndarray):
             "kuvaus": kuvaus_text,
             "suoja": suoja_text,
             "kaapeli": kaapeli_text,
+            "nro": nro_text
         }
         results.append(row_result)
 
@@ -402,6 +413,7 @@ def _classify_page_core(img: np.ndarray):
                 "kuvaus": kuvaus_text,
                 "suoja": suoja_text,
                 "kaapeli": kaapeli_text,
+                "nro": nro_text
             }
 
     return results
