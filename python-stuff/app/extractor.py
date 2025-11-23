@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class ExtractedRow(BaseModel):
     row_index: int
+    nro: str = ""
     symbols: List[str]
     symbol_scores: Dict[str, float]
     kuvaus: str
@@ -53,6 +54,7 @@ def extract_page(page_img: np.ndarray, page_number: int) -> ExtractedPage:
         rows.append(
             ExtractedRow(
                 row_index=int(r.get("row_index", 0)),
+                nro=str(r.get("nro", "")),
                 symbols=list(symbols),
                 symbol_scores={k: float(v) for k, v in symbol_scores.items()},
                 kuvaus=r.get("kuvaus", ""),
