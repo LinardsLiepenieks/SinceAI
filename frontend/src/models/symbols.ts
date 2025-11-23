@@ -51,6 +51,30 @@ export const SYMBOLS: Symbol[] = [
     apiId: 'YHDISTELMASUOJA',
     iconFileName: 'YHDISTELMASUOJA icon.svg',
   },
+    {
+    id: 'THREE_P_STRUCTURE_NEAR_BOTTOM',   // internal ID (your choice, must be unique)
+    name: '3P structure near bottom',      // what appears in the UI card
+    apiId: '3pstructurenearbottom',        // EXACT string your backend sends
+    iconFileName: '3pstructurenearbottom.svg', // file in /public/el_icons
+  },
+  {
+    id: 'cuai',   // internal ID (your choice, must be unique)
+    name: 'cuai',      // what appears in the UI card
+    apiId: 'cuai',        // EXACT string your backend sends
+    iconFileName: 'cuai.svg', // file in /public/el_icons
+  },
+  {
+    id: 'THREE_P_THING_1_LINE_BOX',
+    name: '3P thing 1-line (box)',
+    apiId: '3pthing1linebox',
+    iconFileName: '3pthing1linebox.svg',
+  },
+  {
+    id: 'THREE_P_THING_1_LINE_NOBOX',
+    name: '3P thing 1-line (no box)',
+    apiId: '3pthing1linenobox',
+    iconFileName: '3pthing1linenobox.svg',
+  },
 ];
 
 // Helper function to get symbol by ID
