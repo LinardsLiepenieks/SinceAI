@@ -12,32 +12,62 @@ export const SYMBOLS: Symbol[] = [
   {
     id: 'KATKAISIJA_3_4',
     name: '3 ja 4-NAP KATKAISIJA',
-    apiId: '3_ja_4-NAP_KATKAISIJA',
+    apiId: '3_ja_4_NAP_KATKAISIJA',
     iconFileName: '3 ja 4-NAP KATKAISIJA icon.svg',
+  },
+  {
+    id: 'KONTAKTORI_3',
+    name: '3-NAP KONTAKTORI',
+    apiId: '3_NAP_KONTAKTORI',
+    iconFileName: '3-NAP KONTAKTORI icon.svg',
   },
   {
     id: 'KYTKINVAROKE_3',
     name: '3-NAP KYTKINVAROKE KVKE',
-    apiId: '3-NAP_KYTKINVAROKE_KVKE',
+    apiId: '3_NAP_KYTKINVAROKE_KVKE',
     iconFileName: '3-NAP KYTKINVAROKE KVKE icon.svg',
+  },
+  {
+    id: 'KAHVAROKEALUSTA',
+    name: '3-VAIHE KAHVAROKEALUSTA',
+    apiId: '3_VAIHE_KAHVAROKEALUSTA',
+    iconFileName: '3-VAIHE KAHVAROKEALUSTA icon.svg',
   },
   {
     id: 'TULPPAVAROKE_3',
     name: '3-VAIHEINEN TULPPAVAROKE',
-    apiId: '3-VAIHEINEN_TULPPAVAROKE',
+    apiId: '3_VAIHEINEN_TULPPAVAROKE',
     iconFileName: '3-VAIHEINEN TULPPAVAROKE icon.svg',
+  },
+  {
+    id: 'VIRTAMUUNTAJA_3KPL',
+    name: '3kpl VIRTAMUUNTAJA',
+    apiId: '3kpl_VIRTAMUUNTAJA',
+    iconFileName: '3kpl VIRTAMUUNTAJA icon.svg',
+  },
+  {
+    id: 'CUAI',
+    name: 'CUAI',
+    apiId: 'CUAI',
+    iconFileName: 'CUAI icon.svg',
   },
   {
     id: 'JOHDONSUOJA_1',
     name: 'JOHDONSUOJA 1-NAP',
-    apiId: 'JOHDONSUOJA_1-NAP',
+    apiId: 'JOHDONSUOJA_1_NAP',
     iconFileName: 'JOHDONSUOJA 1-NAP icon.svg',
   },
   {
     id: 'JOHDONSUOJA_3',
     name: 'JOHDONSUOJA 3-NAP',
-    apiId: 'JOHDONSUOJA_3-NAP',
+    apiId: 'JOHDONSUOJA_3_NAP',
     iconFileName: 'JOHDONSUOJA 3-NAP icon.svg',
+  },
+  {
+    id: 'MERKKILAMPPU',
+    name: 'Merkkilamppu DIN tai Kansiasennus',
+    apiId: 'MERKKILAMPPU',
+    iconFileName: 'Merkkilamppu DIN tai Kansiasennus icon.svg',
   },
   {
     id: 'VIKAVIRTASUOJA',
@@ -51,29 +81,11 @@ export const SYMBOLS: Symbol[] = [
     apiId: 'YHDISTELMASUOJA',
     iconFileName: 'YHDISTELMASUOJA icon.svg',
   },
-    {
-    id: 'THREE_P_STRUCTURE_NEAR_BOTTOM',   // internal ID (your choice, must be unique)
-    name: '3P structure near bottom',      // what appears in the UI card
-    apiId: '3pstructurenearbottom',        // EXACT string your backend sends
-    iconFileName: '3pstructurenearbottom.svg', // file in /public/el_icons
-  },
   {
-    id: 'cuai',   // internal ID (your choice, must be unique)
-    name: 'cuai',      // what appears in the UI card
-    apiId: 'cuai',        // EXACT string your backend sends
-    iconFileName: 'cuai.svg', // file in /public/el_icons
-  },
-  {
-    id: 'THREE_P_THING_1_LINE_BOX',
-    name: '3P thing 1-line (box)',
-    apiId: '3pthing1linebox',
-    iconFileName: '3pthing1linebox.svg',
-  },
-  {
-    id: 'THREE_P_THING_1_LINE_NOBOX',
-    name: '3P thing 1-line (no box)',
-    apiId: '3pthing1linenobox',
-    iconFileName: '3pthing1linenobox.svg',
+    id: 'KILOWATTTUNTIMITTARI',
+    name: 'Kilowattituntimittari',
+    apiId: 'KILOWATTTUNTIMITTARI',
+    iconFileName: 'kilowattituntimittari icon.svg',
   },
 ];
 
@@ -91,29 +103,19 @@ export function getSymbolByApiId(apiId: string): Symbol | undefined {
 // The extractor may use spaces or underscores; try a few normalizations.
 export function getSymbolByName(name: string): Symbol | undefined {
   if (!name) return undefined;
-  const raw = String(name).trim();
+  const normalize = (s: string) =>
+    String(s)
+      .toLowerCase()
+      .trim()
+      .replace(/[\s\-]+/g, '_')
+      .replace(/[^a-z0-9_]/g, '');
 
-  // Try exact name match
-  let found = SYMBOLS.find((s) => s.name === raw);
-  if (found) return found;
+  const target = normalize(name);
 
-  // Case-insensitive
-  found = SYMBOLS.find((s) => s.name.toLowerCase() === raw.toLowerCase());
-  if (found) return found;
-
-  // Replace underscores with spaces (common normalization)
-  const alt = raw.replace(/_/g, ' ');
-  found = SYMBOLS.find((s) => s.name.toLowerCase() === alt.toLowerCase());
-  if (found) return found;
-
-  // As a fallback, try matching against apiId by replacing spaces with underscores
-  const alt2 = raw.replace(/\s+/g, '_');
-  found = SYMBOLS.find(
-    (s) => s.apiId === alt2 || s.apiId.toLowerCase() === alt2.toLowerCase()
+  return (
+    SYMBOLS.find((s) => normalize(s.name) === target) ||
+    SYMBOLS.find((s) => normalize(s.apiId) === target)
   );
-  if (found) return found;
-
-  return undefined;
 }
 
 // Helper function to get symbol icon path
