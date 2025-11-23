@@ -1,11 +1,15 @@
-**SinceAI — Quick Overview**
+# SinceAI — Quick Overview
 
-This repo contains a small web app (frontend) and a PDF extraction API (backend). The README below explains the two components, the API routes the frontend calls, and a simple diagram showing how they communicate. The text is short and aimed at non-IT readers.
+This repo contains a small web app (frontend) and a PDF extraction API (backend). The README below explains the two components, the API routes the frontend calls, and simple diagrams showing how they work.
+
+## System Architecture
 
 **Containers / Services:**
 
-- **Frontend:** `Next.js` web app (UI for upload, analyze, and summary). Launch locally with `npm run dev` (default port `3000`).
-- **Backend API (Docker):** `SinceAI PDF API` — Python FastAPI app packaged in Docker. Runs in the repository under `python-stuff/` and the Dockerfile starts the API on port `10000` inside the container.
+- **Frontend:** `Next.js` web app (UI for upload, analyze, and summary) - runs on port `3000`
+- **Backend API:** `SinceAI PDF API` — Python FastAPI app in `python-stuff/` - runs on port `10000`
+
+Both services are orchestrated with `docker-compose.yml` for easy deployment.
 
 **Backend API Routes (what the frontend calls):**
 
@@ -22,53 +26,153 @@ This repo contains a small web app (frontend) and a PDF extraction API (backend)
 - **`/analyze`** — View PDF pages + extraction panels
 - **`/summary`** — Aggregated summary and export
 
-**Simple Communication Diagram (Mermaid)**
+### System Communication Diagram
 
 ```mermaid
 flowchart LR
-	BrowserNode["Browser - user"] -->|"Open UI"| FrontendNode["Next.js frontend"]
-	FrontendNode -->|"POST /extract (file)"| BackendNode["SinceAI PDF API (Docker)"]
-	BackendNode -->|"Extraction JSON"| FrontendNode
-	FrontendNode -->|"Show results & redirect"| AnalyzeNode["/analyze"]
-	AnalyzeNode -->|"Navigate"| SummaryNode["/summary"]
-	classDef note fill:#fff3bf,stroke:#f59e0b,color:#92400e;
-	NoteNode["/analyze and /summary require an uploaded PDF"]:::note
-	AnalyzeNode --> NoteNode
-	SummaryNode --> NoteNode
+    A[Browser User] --> B[Next.js Frontend]
+    B -->|POST /extract| C[FastAPI Backend Docker]
+    C -->|Extraction JSON| B
+    B --> D[/analyze page]
+    D --> E[/summary page]
+
+    style A fill:#e1f5ff
+    style C fill:#fff3cd
+    style E fill:#d4edda
 ```
 
-Notes for non-technical users:
+**Notes for non-technical users:**
 
 - The frontend automatically redirects to `/analyze` after a successful upload (upload → extract → analyze).
 - From the `/analyze` page you can navigate to `/summary` to see aggregated results and export options.
 - Both `/analyze` and `/summary` require an uploaded PDF to work. If no PDF is present the UI will prompt you to upload one.
 
-- To test locally, start the backend container (see `python-stuff/Dockerfile`) and ensure the API is reachable at `http://localhost:10000`.
-- Then run the frontend: open a terminal in the repo root and run:
+## AI Processing Workflow
+
+The extraction technology is lightweight and runs on CPU-only hardware (laptops, embedded devices). It uses classical computer vision and a pretrained OCR model (Tesseract) for data extraction.
+
+### Processing Steps
+
+1. **Ingest document** - Load the input PDF page
+2. **Segment ROIs** - Extract regions using fixed positions or line detection
+3. **Preprocess** - Binarize images and remove noise
+4. **Template matching** - Compare ROIs against symbol templates using OpenCV
+5. **Filter by confidence** - Keep matches above 0.8-0.85 threshold
+6. **OCR text extraction** - Run Tesseract on ROIs for text fields
+7. **Combine data** - Merge symbols, text, and position coordinates
+8. **Output** - Generate structured JSON
+
+### AI Processing Diagram
+
+```mermaid
+flowchart TD
+    A[PDF Page] --> B[Segment ROIs]
+    B --> C[Preprocess]
+    C --> D[Template Matching]
+    C --> E[OCR Tesseract]
+    D --> F{Confidence > 0.8?}
+    F -->|Yes| G[Symbol Detected]
+    F -->|No| H[Discard]
+    E --> I[Text Extracted]
+    G --> J[Structured Output]
+    I --> J
+
+    style A fill:#e1f5ff
+    style J fill:#d4edda
+    style D fill:#fff3cd
+    style E fill:#fff3cd
+```
+
+**Core Features:**
+
+- **CPU-only processing** - No GPU required, runs on standard hardware
+- **Classical computer vision** - OpenCV template matching for symbols
+- **Template-based recognition** - Pre-cut symbol templates from documents
+- **Flexible architecture** - Add new symbols without retraining models
+- **Dual extraction** - Symbols via template matching + text via OCR
+- **Confidence filtering** - Adjustable threshold (typically 0.8-0.85)
+- **Adaptive segmentation** - Handles both fixed and complex page layouts
+
+## Local Testing & Deployment
+
+The entire application (frontend + backend) can be started with a single command using Docker Compose.
+
+**Start both services:**
 
 ```bash
-# start frontend (dev mode)
+# build and start both frontend and backend
+docker-compose up --build
+```
+
+This will:
+
+- Build and start the backend API on `http://localhost:10000`
+- Build and start the frontend on `http://localhost:3000`
+
+Open `http://localhost:3000` in your browser, go to **Upload**, choose a PDF, and click **Upload and Analyze**. The frontend will call the backend `/extract` route and show extracted rows.
+
+**Stop all services:**
+
+```bash
+# stop and remove containers
+docker-compose down
+```
+
+### Development Mode (Optional)
+
+For frontend-only development without Docker:
+
+```bash
+# ensure backend is running (via docker-compose or manually)
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser, go to **Upload**, choose a PDF, and click **Upload and Analyze**. The frontend will call the backend `/extract` route and show extracted rows.
+## Troubleshooting
 
-If something looks wrong (missing icons or values), check the browser console for logs and the backend logs for details.
+- **Services not starting:** Check `docker-compose logs` to see error messages from both services.
+- **Upload failures:** Check browser console and backend logs with `docker-compose logs backend`.
+- **Missing icons/values:** Check browser console for frontend errors and `docker-compose logs backend` for processing details.
+- **Port conflicts:** Ensure ports `3000` and `10000` are not already in use by other applications.
+- **Backend not responding:** Verify services are running with `docker-compose ps` and backend is accessible at `http://localhost:10000/health`.
 
-**Quick Docker commands (backend)**
+## Quick Reference
+
+**Useful Commands:**
 
 ```bash
-# build the backend image (from repo root)
-docker build -t sinceai-python ./python-stuff
+# start everything
+docker-compose up --build
 
-# run the backend container and map port 10000
-docker run --rm -p 10000:10000 sinceai-python
+# start in background (detached mode)
+docker-compose up -d --build
+
+# view logs
+docker-compose logs -f
+
+# view logs for specific service
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# stop everything
+docker-compose down
+
+# rebuild after code changes
+docker-compose up --build
 ```
 
-**Troubleshooting (quick)**
+**Project Structure:**
 
-- If Next dev reports a lock (".next/dev/lock"), stop the running `next dev` process or remove `.next` and restart the frontend.
-- If uploads fail, check browser console and backend logs (container stdout). Ensure `NEXT_PUBLIC_API_URL` points to the running backend (e.g., `http://localhost:10000`).
+```
+SINCEAI/
+├── frontend/          # Next.js application
+│   └── src/
+├── python-stuff/      # Backend API
+│   ├── app/          # FastAPI application code
+│   ├── Dockerfile    # Backend container config
+│   └── requirements.txt
+├── docker-compose.yml # Orchestration config
+└── README.md
+```
 
-That's it — short and simple. If you'd like, I can add a one-line troubleshooting checklist or a diagram image file next.
+If something looks wrong, check the browser console for logs and the backend logs for details.
