@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Eisko Exporter',
+  title: 'Eisko Analyzer',
   description: 'AI-powered electrical diagram PDF analysis and data extraction',
 };
 
